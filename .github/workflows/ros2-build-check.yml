@@ -1,0 +1,44 @@
+name: ROS2 Build Check
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build:
+    name: colcon build & test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Build the environment image (no colcon build inside, just deps)
+      - name: Build Docker environment image
+        run: |
+          docker build \
+            --tag cyber_truck:ci-${{ github.sha }} \
+            --file Dockerfile \
+            .
+
+      # colcon build runs explicitly here — easy to see pass/fail in CI logs
+      - name: colcon build
+        run: |
+          docker run --rm \
+            cyber_truck:ci-${{ github.sha }} \
+            bash -c "source /opt/ros/humble/setup.bash && \
+                     cd /app/cyber_truck && \
+                     colcon build --event-handlers console_cohesion+"
+
+      # Placeholder — uncomment when you have tests
+      # - name: colcon test
+      #   run: |
+      #     docker run --rm \
+      #       cyber_truck:ci-${{ github.sha }} \
+      #       bash -c "source /opt/ros/humble/setup.bash && \
+      #                cd /app/cyber_truck && \
+      #                source install/setup.bash && \
+      #                colcon test --event-handlers console_cohesion+ && \
+      #                colcon test-result --verbose"
