@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 
 find_package(robot_state_publisher REQUIRED)
 find_package(ros_ign_gazebo REQUIRED)
-(ros_ign_bridge REQUIRED)
+find_package(ros_ign_bridge REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(xacro REQUIRED)
 
